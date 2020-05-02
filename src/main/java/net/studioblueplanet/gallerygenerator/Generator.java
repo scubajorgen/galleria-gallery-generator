@@ -9,8 +9,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants;
@@ -154,14 +156,9 @@ public class Generator
         }
         try
         {
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            objectMapper.setSerializationInclusion(Include.NON_NULL); 
-//            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-//            ObjectWriter objectWriter =objectMapper.writer(new MyPrettyPrinter());
-            
             if (options.split)
             {
-                albums=gallery.getAlbums();
+                albums=this.splitGallery(gallery);
                 for (Album album : albums)
                 {
                     albumFileName=options.galleryDirectory+'/'+album.getDirectory()+'/'+JSONALBUMFILE;
@@ -182,8 +179,6 @@ public class Generator
                     {
                         LOG.info("Abum file {} not written because the album was not changed", albumFileName);
                     }
-                    // set the images to null to prevent them from being also written to the gallery JSON file
-                    album.setImages(null);
                 }
             }
             objectWriter.writeValue(new File(galleryFileName), gallery);
@@ -337,7 +332,7 @@ public class Generator
                                                                                "$1-$2-$3 $4:$5:$6");
                                 }
                             }
-                            catch(Exception e)
+                            catch(IOException | ImageReadException e)
                             {
                                 LOG.error("Error {}", e.getMessage());
                             }
@@ -434,6 +429,29 @@ public class Generator
         }
     }
     
+    /**
+     * This method saves returns the gallery albums and replaces
+     * the albums in the gallery with clones without the list of images
+     * @param gallery Gallery to process
+     * @return Original list of galleryAlbums
+     */
+    private List<Album> splitGallery(Gallery gallery)
+    {
+        List<Album> albums;
+        
+        albums=gallery.getAlbums();
+        
+        gallery.setAlbums(new ArrayList<>());
+        albums.forEach((album) ->
+        {
+            gallery.addAlbum(album.cloneNoImages());
+        });
+        
+        return albums;
+    }
+    
+    
+    
     @Autowired
     public Generator(ObjectMapper mapper, ObjectWriter writer, FileBackupper backupper)
     {
@@ -441,6 +459,8 @@ public class Generator
         this.objectWriter=writer;
         this.backupper=backupper;
     }
+    
+    
     
     
     /**

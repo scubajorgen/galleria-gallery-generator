@@ -106,6 +106,24 @@ public class Album
         return changed;
     }
     
+    /**
+     * Creates a clone of this Album, however, without the images
+     * @return The cloned album
+     */
+    public Album cloneNoImages()
+    {
+        Album album;
+        
+        album=new Album();
+        
+        album.name          =name;
+        album.description   =description;
+        album.thumbnail     =thumbnail;
+        album.directory     =directory;
+        album.changed       =changed;
+        return album;
+    }
+    
     @Override
     public String toString()
     {
