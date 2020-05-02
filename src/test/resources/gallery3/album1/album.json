@@ -1,15 +1,15 @@
 {
-  "name": "Don't care",
-  "description": "Don't care",
+  "name": "Test Album 1",
+  "description": "Description 1",
   "directory": "album1",
-  "thumbnail": "thumbnail.jpg",
+  "thumbnail": "thumbnail1.jpg",
   "images": 
   [
     {
-      "title": "Image 1",
+      "title": "Image 2",
       "caption": "Description",
-      "image": "album1_image2.jpg",
-      "captureDateTime": "2020-05-01 19:00:13"
+      "image": "album1_image3.jpg",
+      "captureDateTime": "2020-05-01 20:00:12"
     }, 
     {
       "title": "Image 3",

@@ -7,7 +7,7 @@
       "name": "Test Album 1",
       "description": "Description 1",
       "directory": "album1",
-      "thumbnail": "thumbnail.jpg",
+      "thumbnail": "thumbnail1.jpg",
       "images": 
       [
         {
@@ -28,7 +28,7 @@
       "name": "Test Album 2",
       "description": "Description 2",
       "directory": "album2",
-      "thumbnail": "thumbnail.jpg",
+      "thumbnail": "thumbnail2.jpg",
       "images": 
       [
         {
