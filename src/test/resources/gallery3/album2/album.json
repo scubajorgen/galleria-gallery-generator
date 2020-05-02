@@ -1,0 +1,21 @@
+{
+  "name": "Don't care",
+  "description": "Don't care",
+  "directory": "album2",
+  "thumbnail": "thumbnail.jpg",
+  "images": 
+  [
+    {
+      "title": "Image 1",
+      "caption": "Description",
+      "image": "album2_image2.jpg",
+      "captureDateTime": "2020-04-29 19:00:13"
+    }, 
+    {
+      "title": "Image 2",
+      "caption": "Description",
+      "image": "album2_image1.jpg",
+      "captureDateTime": "2020-04-30 19:00:12"
+    }
+  ]
+}
