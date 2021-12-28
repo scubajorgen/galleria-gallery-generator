@@ -23,7 +23,10 @@ public class Album
     private List<Image> images;
     
     @JsonIgnore
-    private boolean     changed;   
+    private boolean     changed;
+    
+    @JsonIgnore
+    private boolean     imagesReadFromGallery;
 
     /**
      * Constructor
@@ -105,6 +108,18 @@ public class Album
     {
         return changed;
     }
+
+    public boolean isImagesReadFromGallery()
+    {
+        return imagesReadFromGallery;
+    }
+
+    public void setImagesReadFromGallery(boolean imagesReadFromGallery)
+    {
+        this.imagesReadFromGallery = imagesReadFromGallery;
+    }
+
+
     
     /**
      * Creates a clone of this Album, however, without the images

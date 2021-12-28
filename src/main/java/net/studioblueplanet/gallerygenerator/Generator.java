@@ -75,8 +75,16 @@ public class Generator
             {
                 if (album.getImages()==null)
                 {
-                    albumRead=readJsonAlbum(galleryDirectory, album);
-                    album.setImages(albumRead.getImages());
+                    if (jsonAlbumExists(galleryDirectory, album))
+                    {
+                        albumRead=readJsonAlbum(galleryDirectory, album);
+                        album.setImages(albumRead.getImages());
+                    }
+                    else
+                    {
+                        album.setImages(new ArrayList<Image>());
+                    }
+                    album.setImagesReadFromGallery(false);
                 }
                 else
                 {
@@ -89,6 +97,7 @@ public class Generator
                             LOG.warn("Album file ({}) and Gallery file contain image definitions", album.getDirectory());
                         }
                     }
+                    album.setImagesReadFromGallery(true);
                 }
                     
             }
@@ -162,7 +171,7 @@ public class Generator
                 for (Album album : albums)
                 {
                     albumFileName=options.galleryDirectory+'/'+album.getDirectory()+'/'+JSONALBUMFILE;
-                    if (album.isChanged())
+                    if (album.isChanged() || album.isImagesReadFromGallery())
                     {
                         albumFileName=options.galleryDirectory+'/'+album.getDirectory()+'/'+JSONALBUMFILE;
                         albumFile =new File(albumFileName);
@@ -309,97 +318,103 @@ public class Generator
             }
 
             imagePath=new File(options.galleryDirectory+"/"+options.albumDirectory+"/"+IMAGEDIR);
-            files = imagePath.listFiles();
-            for(File file : files)
+            if (imagePath.exists())
             {
-                if (file.isFile())
+                files = imagePath.listFiles();
+                for(File file : files)
                 {
-                    fileName=file.getName();
-                    if (isAllowedFileName(fileName))
+                    if (file.isFile())
                     {
-                        // Get the capture date time
-                        captureDateTime=null;
-                        if (isJpgFile(fileName))
+                        fileName=file.getName();
+                        if (isAllowedFileName(fileName))
                         {
-                            try
+                            // Get the capture date time
+                            captureDateTime=null;
+                            if (isJpgFile(fileName))
                             {
-                                metadata = (JpegImageMetadata)Imaging.getMetadata(file);
-                                TiffField field=metadata.findEXIFValue(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
-                                if ((field!=null) && (options.addExifDateTime))
+                                try
                                 {
-                                    captureDateTime=field.getValueDescription();
-                                    captureDateTime=captureDateTime.replaceAll("'([0-9]{4}):([0-9]{2}):([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})'", 
-                                                                               "$1-$2-$3 $4:$5:$6");
+                                    metadata = (JpegImageMetadata)Imaging.getMetadata(file);
+                                    TiffField field=metadata.findEXIFValue(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
+                                    if ((field!=null) && (options.addExifDateTime))
+                                    {
+                                        captureDateTime=field.getValueDescription();
+                                        captureDateTime=captureDateTime.replaceAll("'([0-9]{4}):([0-9]{2}):([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})'", 
+                                                                                   "$1-$2-$3 $4:$5:$6");
+                                    }
+                                }
+                                catch(IOException | ImageReadException e)
+                                {
+                                    LOG.error("Error {}", e.getMessage());
                                 }
                             }
-                            catch(IOException | ImageReadException e)
-                            {
-                                LOG.error("Error {}", e.getMessage());
-                            }
-                        }
-                        
-                        if (!gallery.imageFileExists(options.albumDirectory, fileName) && (options.mode==ModeType.MODE_MERGEEXISTING))
-                        {
-                            LOG.debug("Adding new image {}", fileName);
 
-                            if (isPhotoFile(fileName))
+                            if (!gallery.imageFileExists(options.albumDirectory, fileName) && (options.mode==ModeType.MODE_MERGEEXISTING))
                             {
-                                album.addImage(new Image("", "", captureDateTime, fileName, null));
-                                count++;
-                            }
-                            else if (isVideoFile(fileName))
-                            {
-                                album.addImage(new Image("", "", captureDateTime, null, fileName));
-                                count++;
+                                LOG.debug("Adding new image {}", fileName);
+
+                                if (isPhotoFile(fileName))
+                                {
+                                    album.addImage(new Image("", "", captureDateTime, fileName, null));
+                                    count++;
+                                }
+                                else if (isVideoFile(fileName))
+                                {
+                                    album.addImage(new Image("", "", captureDateTime, null, fileName));
+                                    count++;
+                                }
+                                else
+                                {
+                                    LOG.error("Not allowed file type {}", fileName);
+                                }
+
+                                thumbnail=new File(options.galleryDirectory+"/"+options.albumDirectory+"/"+THUMBNAILDIR+"/"+fileName);
+                                if (!thumbnail.exists())
+                                {
+                                    LOG.warn("Found file {} but not the thumbnail...", fileName);
+                                }
                             }
                             else
                             {
-                                LOG.error("Not allowed file type {}", fileName);
-                            }
-
-                            thumbnail=new File(options.galleryDirectory+"/"+options.albumDirectory+"/"+THUMBNAILDIR+"/"+fileName);
-                            if (!thumbnail.exists())
-                            {
-                                LOG.warn("Found file {} but not the thumbnail...", fileName);
-                            }
-                        }
-                        else
-                        {
-                            if (options.mode==ModeType.MODE_COMPLEMENT)
-                            {
-                                Image image=gallery.getImage(options.albumDirectory, fileName);
-                                if (image!=null)
+                                if (options.mode==ModeType.MODE_COMPLEMENT)
                                 {
-                                    if (image.getCaptureDateTime()==null && captureDateTime!=null)
+                                    Image image=gallery.getImage(options.albumDirectory, fileName);
+                                    if (image!=null)
                                     {
-                                        image.setCaptureDateTime(captureDateTime);
-                                        LOG.debug("Complementing image {}, setting date to {}", fileName, captureDateTime);
+                                        if (image.getCaptureDateTime()==null && captureDateTime!=null)
+                                        {
+                                            image.setCaptureDateTime(captureDateTime);
+                                            LOG.debug("Complementing image {}, setting date to {}", fileName, captureDateTime);
+                                        }
+                                        else
+                                        {
+                                            LOG.debug("Skipping image {} because datetime already set or no date in exif", fileName);
+                                        }
                                     }
                                     else
                                     {
-                                        LOG.debug("Skipping image {} because datetime already set or no date in exif", fileName);
+                                        LOG.debug("Skipping image {} because image not in JSON; first merge", fileName);
                                     }
                                 }
                                 else
                                 {
-                                    LOG.debug("Skipping image {} because image not in JSON; first merge", fileName);
+                                    LOG.debug("Skipping image {} because of mode", fileName);
                                 }
-                            }
-                            else
-                            {
-                                LOG.debug("Skipping image {} because of mode", fileName);
                             }
                         }
                     }
                 }
-
+                // Only sort new albums; existing: keep existing order
+                if (isNew)
+                {
+                    Collections.sort(album.getImages());
+                }
+                LOG.info("Added {} items to album {}", count, options.albumDirectory);
             }
-            // Only sort new albums; existing: keep existing order
-            if (isNew)
+            else
             {
-                Collections.sort(album.getImages());
+                LOG.error("Path/album {} does not exist", imagePath.getAbsolutePath());
             }
-            LOG.info("Added {} items to album {}", count, options.albumDirectory);
         }
         else
         {
