@@ -8,6 +8,7 @@ package net.studioblueplanet.gallerygenerator;
 import java.util.List;
 import java.util.ArrayList;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Collections;
 
 /**
  *
@@ -117,6 +118,15 @@ public class Album
     public void setImagesReadFromGallery(boolean imagesReadFromGallery)
     {
         this.imagesReadFromGallery = imagesReadFromGallery;
+    }
+    
+    /**
+     * Sort the images according to the method set
+     */
+    public void sort()
+    {
+        Collections.sort(images);
+        changed=true;
     }
 
 

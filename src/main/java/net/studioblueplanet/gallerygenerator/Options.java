@@ -13,6 +13,7 @@ public class Options
 {
     public String               galleryDirectory    =null;
     public String               albumDirectory      =null;
+    public Image.Sorting        sorting             =Image.Sorting.SORTING_KEEPEXISTING;
     public Generator.ModeType   mode                =Generator.ModeType.MODE_SKIPEXISTING;  
     public boolean              split               =false;
     public boolean              addExifDateTime     =false;
@@ -37,6 +38,26 @@ public class Options
         }
         return mode;
     }    
+
+    private Image.Sorting getSorting(String argument)
+    {
+        Image.Sorting sorting;
+        
+        sorting=Image.Sorting.SORTING_DATETIME;
+        if (argument.toLowerCase().equals("datetime"))
+        {
+           sorting=Image.Sorting.SORTING_DATETIME;
+        }
+        else if (argument.toLowerCase().equals("filename"))
+        {
+           sorting=Image.Sorting.SORTING_FILENAME;
+        }
+        else if (argument.toLowerCase().equals("keepexistingorder"))
+        {
+           sorting=Image.Sorting.SORTING_KEEPEXISTING;
+        }
+        return sorting;
+    }
     
     public static Options argsParser(String[] args)
     {
@@ -69,6 +90,9 @@ public class Options
                             break;
                         case 's':
                             options.split=args[i+1].toLowerCase().equals("yes");
+                            break;
+                        case 'o':
+                            options.sorting=options.getSorting(args[i+1]);
                             break;
                     }
                 }

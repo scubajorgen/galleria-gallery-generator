@@ -167,8 +167,8 @@ public class GeneratorTest
         ArgumentCaptor<File>    fileCaptor;
         Gallery                 gallery;
         
-        galleryCaptor=ArgumentCaptor.forClass(Object.class);
-        fileCaptor=ArgumentCaptor.forClass(File.class);
+        galleryCaptor   =ArgumentCaptor.forClass(Object.class);
+        fileCaptor      =ArgumentCaptor.forClass(File.class);
         
         System.out.println("generate: MERGE, new album, no split");
         Options options         = new Options();
@@ -177,6 +177,7 @@ public class GeneratorTest
         options.mode            =Generator.ModeType.MODE_MERGEEXISTING;
         options.addExifDateTime =true;
         options.split           =false;
+        options.sorting         =Image.Sorting.SORTING_DATETIME;
         Generator instance      = new Generator(mapper, writer, backupper);
         instance.generate(options);
         verify(writer, times(1)).writeValue(fileCaptor.capture(), galleryCaptor.capture());
@@ -215,6 +216,7 @@ public class GeneratorTest
         options.mode            =Generator.ModeType.MODE_MERGEEXISTING;
         options.addExifDateTime =true;
         options.split           =true;
+        options.sorting         =Image.Sorting.SORTING_DATETIME;
         Generator instance      = new Generator(mapper, writer, backupper);
         instance.generate(options);
         verify(writer, times(3)).writeValue(fileCaptor.capture(), galleryCaptor.capture());
@@ -266,6 +268,7 @@ public class GeneratorTest
         options.mode            =Generator.ModeType.MODE_MERGEEXISTING;
         options.addExifDateTime =true;
         options.split           =false;
+        options.sorting         =Image.Sorting.SORTING_KEEPEXISTING;
         Generator instance      = new Generator(mapper, writer, backupper);
         instance.generate(options);
         
@@ -312,6 +315,7 @@ public class GeneratorTest
         options.mode            =Generator.ModeType.MODE_COMPLEMENT;
         options.addExifDateTime =true;
         options.split           =false;
+        options.sorting         =Image.Sorting.SORTING_KEEPEXISTING;
         Generator instance      = new Generator(mapper, writer, backupper);
         instance.generate(options);
         
@@ -325,7 +329,7 @@ public class GeneratorTest
         
         album1=gallery.getAlbum("album1");
         album2=gallery.getAlbum("album2");
-        this.validateExistingAlbums(album1, 2, album2, 1);
+        validateExistingAlbums(album1, 2, album2, 1);
         
         assertEquals("2020-04-29 19:00:13", album2.getImages().get(0).getCaptureDateTime());
         
@@ -358,6 +362,7 @@ public class GeneratorTest
         options.mode            =Generator.ModeType.MODE_SKIPEXISTING;
         options.addExifDateTime =true;
         options.split           =false;
+        options.sorting         =Image.Sorting.SORTING_KEEPEXISTING;
         Generator instance      = new Generator(mapper, writer, backupper);
         instance.generate(options);
         
@@ -371,7 +376,7 @@ public class GeneratorTest
         
         album1=gallery.getAlbum("album1");
         album2=gallery.getAlbum("album2");
-        this.validateExistingAlbums(album1, 2, album2, 1);
+        validateExistingAlbums(album1, 2, album2, 1);
         assertEquals(null, album2.getImages().get(0).getCaptureDateTime());
         
         verify(backupper, times(1)).backupFile(backupFileCaptor.capture(), any());
@@ -403,6 +408,7 @@ public class GeneratorTest
         options.mode            =Generator.ModeType.MODE_MERGEEXISTING;
         options.addExifDateTime =true;
         options.split           =true;
+        options.sorting         =Image.Sorting.SORTING_KEEPEXISTING;
         Generator instance      = new Generator(mapper, writer, backupper);
         instance.generate(options);
         

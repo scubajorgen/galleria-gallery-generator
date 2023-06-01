@@ -45,7 +45,10 @@ public class GalleryGenerator implements CommandLineRunner
         LOG.info("                        COMPLEMENT   to add new Images and parse capture date time for existing images");
         LOG.info("       -s <yes/no>      Specific whether one gallery.json is created containing all (no) or ");
         LOG.info("                        whether the file should be split in gallery.json and album.json files (yes)");
-        LOG.info("Example: java -jar GalleryGenerator.jar -g gallery -a album -e no -s yes -m MERGE");
+        LOG.info("       -o <sorting>     Defines the sorting method: ");
+        LOG.info("                        DATETIME     sort on datetime");
+        LOG.info("                        FILENAME     sort on filename");
+        LOG.info("Example: java -jar GalleryGenerator.jar -g gallery -a album -e no -s yes -m MERGE -o DATETIME");
    }
     
 
