@@ -196,7 +196,7 @@ public class ImageTest
      * Test of compareTo method, of class Image.
      */
     @Test
-    public void testCompareTo()
+    public void testCompareToDateTime()
     {
         int expResult;
         int result;
@@ -215,5 +215,55 @@ public class ImageTest
         result = instance.compareTo(image3);
         assertEquals(expResult, result);
     }
+
+    /**
+     * Test of compareTo method, of class Image.
+     */
+    @Test
+    public void testCompareToFileName()
+    {
+        int expResult;
+        int result;
+        System.out.println("compareTo - Filename");
+        Image.setSortingMethod(Image.Sorting.SORTING_FILENAME);
+        Image instance  = new Image("", "", "2020-05-01 18:42:10", "5hoi", null);
+        Image instance2  = new Image("", "", "2020-05-01 18:42:10", "5hoi", null);
+        Image image1    = new Image("", "", "2020-05-01 18:42:10", "4greater", null);
+        Image image2    = new Image("", "", "2020-05-01 18:42:10", "6smaller", null);
+        Image image3    = new Image("", "", "2020-05-01 18:42:11", "5hoi", null);
+        Image image4    = new Image("", "", "2020-05-01 18:42:10", null, "4greater");
+        Image image5    = new Image("", "", "2020-05-01 18:42:10", null, "6smaller");
+        Image image6    = new Image("", "", "2020-05-01 18:42:11", null, "5hoi");
+        expResult= +1;
+        result = instance.compareTo(image1);
+        assertEquals(expResult, result);
+        expResult= -1;
+        result = instance.compareTo(image2);
+        assertEquals(expResult, result);
+        expResult= 0;
+        result = instance.compareTo(image3);
+        assertEquals(expResult, result);
+
+        expResult= +1;
+        result = instance.compareTo(image4);
+        assertEquals(expResult, result);
+        expResult= -1;
+        result = instance.compareTo(image5);
+        assertEquals(expResult, result);
+        expResult= 0;
+        result = instance.compareTo(image6);
+        assertEquals(expResult, result);    
+
+        expResult= +1;
+        result = instance2.compareTo(image4);
+        assertEquals(expResult, result);
+        expResult= -1;
+        result = instance2.compareTo(image5);
+        assertEquals(expResult, result);
+        expResult= 0;
+        result = instance2.compareTo(image6);
+        assertEquals(expResult, result);   
+    }
+
     
 }

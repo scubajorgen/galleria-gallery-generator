@@ -5,17 +5,30 @@
  */
 package net.studioblueplanet.gallerygenerator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  *
  * @author jorgen
  */
 public class Image implements Comparable<Image>
 {
-    String title;
-    String caption;
-    String image;
-    String video;
-    String captureDateTime;
+    public enum Sorting
+    {
+        SORTING_FILENAME,
+        SORTING_DATETIME,
+        SORTING_KEEPEXISTING
+    }
+    
+    private static final Logger LOG = LoggerFactory.getLogger(Image.class);    
+    private static Sorting sorting=Sorting.SORTING_KEEPEXISTING;
+    
+    String title;           // title
+    String caption;         // caption
+    String image;           // image filename, null for video
+    String video;           // video filename, null for photo
+    String captureDateTime; // capture date time
 
     public Image(String title, String caption, String captureDateTime, String image, String video)
     {
@@ -26,6 +39,15 @@ public class Image implements Comparable<Image>
         this.video=video;
     }
 
+    /**
+     * Set the sorting method. Default is datetime
+     * @param sortingMethod SORTING_FILENAME or SORTING_DATETIME
+     */
+    public static void setSortingMethod(Sorting sortingMethod)
+    {
+        sorting=sortingMethod;
+    }
+    
     public String getCaptureDateTime()
     {
         return captureDateTime;
@@ -107,25 +129,69 @@ public class Image implements Comparable<Image>
     public int compareTo(Image image) 
     {
         String dateTime;
+        String thisName =null;
+        String name     =null;
         int    compare;
+        
+        compare=0;
 
-        dateTime=image.getCaptureDateTime();
-
-        if (this.captureDateTime==null)
+        if (sorting==Sorting.SORTING_FILENAME)
         {
-            compare=-1;
-        }
-        else
-        {
-            if (dateTime==null)
+            if (this.image!=null && !this.image.equals(""))
             {
-                compare=1;
+                thisName=this.image;
+            }
+            else if (this.video!=null && !this.video.equals(""))
+            {
+                thisName=this.video;
             }
             else
             {
-                compare=this.captureDateTime.compareTo(dateTime);
+                LOG.error("No suitable filename found for sorting");
+            }
+            
+            if (image.image!=null && !image.image.equals(""))
+            {
+                name=image.image;
+            }
+            else if (image.video!=null && !image.video.equals(""))
+            {
+                name=image.video;
+            }
+            else
+            {
+                LOG.error("No suitable filename found for sorting");
+            }
+            if (thisName!=null && name!=null)
+            {
+                compare=thisName.compareTo(name);
+            } 
+        }
+        else if (sorting==Sorting.SORTING_DATETIME)
+        {
+            dateTime=image.getCaptureDateTime();
+
+            if (this.captureDateTime==null)
+            {
+                compare=-1;
+            }
+            else
+            {
+                if (dateTime==null)
+                {
+                    compare=1;
+                }
+                else
+                {
+                    compare=this.captureDateTime.compareTo(dateTime);
+                }
             }
         }
+        else if (sorting==Sorting.SORTING_KEEPEXISTING)
+        {
+            compare=0;
+        }
+
         return compare;
     }    
    

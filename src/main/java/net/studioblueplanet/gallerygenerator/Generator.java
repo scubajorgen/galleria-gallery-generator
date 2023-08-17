@@ -404,12 +404,9 @@ public class Generator
                         }
                     }
                 }
-                // Only sort new albums; existing: keep existing order
-                if (isNew)
-                {
-                    Collections.sort(album.getImages());
-                }
                 LOG.info("Added {} items to album {}", count, options.albumDirectory);
+                LOG.info("Sorting album {} according to {}", options.albumDirectory, options.sorting);
+                album.sort();
             }
             else
             {
@@ -485,6 +482,8 @@ public class Generator
     public void generate(Options options)
     {
         Gallery gallery;
+        
+        Image.setSortingMethod(options.sorting);
         
         // If the gallery json file exists, read it; else new gallery
         if (new File(options.galleryDirectory+'/'+JSONGALLERYFILE).exists())
