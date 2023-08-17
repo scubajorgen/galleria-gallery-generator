@@ -43,7 +43,7 @@ public class Options
     {
         Image.Sorting sorting;
         
-        sorting=Image.Sorting.SORTING_DATETIME;
+        sorting=Image.Sorting.SORTING_KEEPEXISTING;
         if (argument.toLowerCase().equals("datetime"))
         {
            sorting=Image.Sorting.SORTING_DATETIME;

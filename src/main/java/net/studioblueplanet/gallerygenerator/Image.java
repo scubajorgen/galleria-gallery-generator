@@ -41,7 +41,7 @@ public class Image implements Comparable<Image>
 
     /**
      * Set the sorting method. Default is datetime
-     * @param sortingMethod SORTING_FILENAME or SORTING_DATETIME
+     * @param sortingMethod SORTING_FILENAME or SORTING_DATETIME or SORTING_KEEPEXISTING
      */
     public static void setSortingMethod(Sorting sortingMethod)
     {

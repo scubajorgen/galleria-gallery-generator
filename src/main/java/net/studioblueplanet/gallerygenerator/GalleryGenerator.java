@@ -48,6 +48,7 @@ public class GalleryGenerator implements CommandLineRunner
         LOG.info("       -o <sorting>     Defines the sorting method: ");
         LOG.info("                        DATETIME     sort on datetime");
         LOG.info("                        FILENAME     sort on filename");
+        LOG.info("                        KEEPEXISTING to keep existing order");
         LOG.info("Example: java -jar GalleryGenerator.jar -g gallery -a album -e no -s yes -m MERGE -o DATETIME");
    }
     
